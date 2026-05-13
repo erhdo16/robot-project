@@ -24,3 +24,6 @@
 - MATLAB
 - Robotics Toolbox
 - Image Processing Toolbox
+
+#草稿
+手势：比心、数字、打招呼
