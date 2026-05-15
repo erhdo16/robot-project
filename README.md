@@ -21,10 +21,23 @@
 - demo：最终演示
 
 ## 开发环境
-- MATLAB
-- Robotics System Toolbox
-- Image Processing Toolbox
+- MATLAB（2025b及以上）
+## 核心仿真与控制
+- Simulink
+- Simscape & Simscape Multibody（这两个通常一起装）
 
+负责把 URDF 文件变成一个有重力、有碰撞、能动的 3D 物理机器人。
+- Robotics System Toolbox (机器人系统工具箱)
+- Image Processing Toolbox
+- Control System Toolbox (控制系统工具箱)
+## 视觉识别与交互逻辑
+- Computer Vision Toolbox (计算机视觉工具箱)
+
+调用摄像头采集画面，提取人手的特征。
+- Image Processing Toolbox (图像处理工具箱)
+
+视觉辅助。比如把摄像头的背景去掉，只锁定手部区域，减少干扰。
+- Deep Learning Toolbox (深度学习工具箱)
 ## 时间
 第15周 6.2/6.4
 
