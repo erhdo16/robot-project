@@ -28,6 +28,9 @@
 ## 时间
 第15周 6.2/6.4
 
+## 文件解释
+<img width="1166" height="500" alt="image" src="https://github.com/user-attachments/assets/c3ce7da0-d0c1-4abf-b392-692665c869d8" />
+
 ## 草稿
 手势：比心、数字、打招呼
 
