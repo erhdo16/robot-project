@@ -22,7 +22,7 @@
 
 ## 开发环境
 - MATLAB
-- Robotics Toolbox
+- Robotics System Toolbox
 - Image Processing Toolbox
 
 ## 时间
