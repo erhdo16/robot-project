@@ -23,11 +23,11 @@
 ## 开发环境
 - MATLAB（2025b及以上）
 ## 核心仿真与控制
-- Simulink
+- **Simulink**
+- **Robotics System Toolbox (机器人系统工具箱)**
 - Simscape & Simscape Multibody（这两个通常一起装）
 
 负责把 URDF 文件变成一个有重力、有碰撞、能动的 3D 物理机器人。
-- Robotics System Toolbox (机器人系统工具箱)
 - Image Processing Toolbox
 - Control System Toolbox (控制系统工具箱)
 ## 视觉识别与交互逻辑
