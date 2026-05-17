@@ -68,10 +68,13 @@
 - 中指 (Middle): &nbsp; 48 (2_pitch), &nbsp; 49 (3_pitch) —— 耦合运动
 - 无名指 (Ring): &nbsp; 50 (2_pitch), &nbsp; 51 (3_pitch) —— 耦合运动
 - 大拇指 (Thumb): &nbsp; 52 (1_roll), &nbsp; 53 (2_pitch), &nbsp; 54 (3_pitch) —— 较为复杂的运动
+
 **2_pitch  = 近节（PIP关节）- 主动控制关节 = 靠近手掌的指节**
+
 **3_pitch  = 远节（DIP关节）- 耦合被动关节 = 指尖的指节**
+
 **远节角度 = COUPLE × 近节角度 (COUPLE = 0.7;)**
-**
+
 ### 3. 左臂与左手 (Left Arm & Hand) —— 镜像部位
 **若需要双臂舞蹈，参数与右侧镜像对应：**
 - 左臂 (7-DOF): 关节 19 (left_shoulder_pitch) 到 25 (left_wrist_yaw)。
