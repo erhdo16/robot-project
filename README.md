@@ -51,13 +51,13 @@
 
 | 序号 | 关节名称 | 类型 | 功能描述 |
 |:----:|:---------:|:----:|:---------|
-| 37 | right_shoulder_pitch | Revolute | 肩部俯仰 |
-| 38 | right_shoulder_roll | Revolute | 肩部外展/内收 |
-| 39 | right_shoulder_yaw | Revolute | 肩部旋转（大臂旋内/旋外） |
-| 40 | right_elbow_pitch | Revolute | 肘部俯仰（屈肘） |
-| 41 | right_elbow_yaw | Revolute | 肘部旋转（前臂旋前/旋后） |
-| 42 | right_wrist_pitch | Revolute | 腕部俯仰 |
-| 43 | right_wrist_yaw | Revolute | 腕部偏航（末端旋转） |
+| 37 | right_shoulder_pitch | Revolute | 肩部俯仰 前((+)后(-)抬臂 |
+| 38 | right_shoulder_roll | Revolute | 肩部外展(+)/内收(-) |
+| 39 | right_shoulder_yaw | Revolute | 肩部旋转（大臂旋内+/旋外-） |
+| 40 | right_elbow_pitch | Revolute | 肘部俯仰 (屈肘+/伸展-) |
+| 41 | right_elbow_yaw | Revolute | 肘部旋转（前臂旋前(内)+/旋后-） |
+| 42 | right_wrist_pitch | Revolute | 腕部俯仰(勾手+/翘手-)  |
+| 43 | right_wrist_yaw | Revolute | 腕部偏航（末端旋转） (向拇指方向偏+|
  
  Yaw-Pitch-Roll
 
@@ -68,6 +68,10 @@
 - 中指 (Middle): &nbsp; 48 (2_pitch), &nbsp; 49 (3_pitch) —— 耦合运动
 - 无名指 (Ring): &nbsp; 50 (2_pitch), &nbsp; 51 (3_pitch) —— 耦合运动
 - 大拇指 (Thumb): &nbsp; 52 (1_roll), &nbsp; 53 (2_pitch), &nbsp; 54 (3_pitch) —— 较为复杂的运动
+**2_pitch  = 近节（PIP关节）- 主动控制关节 = 靠近手掌的指节**
+**3_pitch  = 远节（DIP关节）- 耦合被动关节 = 指尖的指节**
+**远节角度 = COUPLE × 近节角度 (COUPLE = 0.7;)**
+**
 ### 3. 左臂与左手 (Left Arm & Hand) —— 镜像部位
 **若需要双臂舞蹈，参数与右侧镜像对应：**
 - 左臂 (7-DOF): 关节 19 (left_shoulder_pitch) 到 25 (left_wrist_yaw)。
@@ -80,6 +84,17 @@
 | 17 | 颈部 | `head_yaw` | 🔄 头部左右转动（水平扫描） |
 | 18 | 颈部 | `head_pitch` | ⬆️⬇️ 头部上下俯仰（寻找地面目标或人脸） |
 
+### 补充
+共54个关节，但其中2个是fixed关节:
+- body7  (llegsite)  —— 左脚固定连接，不进入配置向量
+- body14 (rlegsite)  —— 右脚固定连接，不进入配置向量
+- 因此配置向量长度 = 54 - 2 = 52
+### 总索引
+- body 1-6   → 配置 1-6    （左腿6关节）
+- body 7     → 跳过（fixed）
+- body 8-13  → 配置 7-12   （右腿6关节）
+- body 14    → 跳过（fixed）
+- body 15-54 → 配置 13-52  （腰/头/双臂/双手）
 ###### 视觉信息说明：
 - 相机挂载点： 通常位于 head_pitch (Body 18) 的末端。
 - 手眼协调 (Hand-Eye Calibration)： 如果你要做视觉引导的抓取或交互，你需要计算从 head_pitch 坐标系到 right_wrist_yaw 坐标系的变换矩阵。
