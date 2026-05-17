@@ -58,6 +58,8 @@
 | 41 | right_elbow_yaw | Revolute | 肘部旋转（前臂旋前/旋后） |
 | 42 | right_wrist_pitch | Revolute | 腕部俯仰 |
 | 43 | right_wrist_yaw | Revolute | 腕部偏航（末端旋转） |
+ 
+ Yaw-Pitch-Roll
 
 ## 2. 右手 (Right Hand) —— 欠驱动手势设计
 **结构：11个物理关节，由5个驱动源（电机）耦合控制。需要通过控制电机来带动以下物理关节：**
