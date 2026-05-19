@@ -28,11 +28,10 @@
 - Simscape & Simscape Multibody（这两个通常一起装）
 
 负责把 URDF 文件变成一个有重力、有碰撞、能动的 3D 物理机器人。
-- Image Processing Toolbox
 - Control System Toolbox (控制系统工具箱)
 ## 视觉识别与交互逻辑
 - Computer Vision Toolbox (计算机视觉工具箱)
-
+- MATLAB Support Package for USB Webcams
 调用摄像头采集画面，提取人手的特征。
 - Image Processing Toolbox (图像处理工具箱)
 
