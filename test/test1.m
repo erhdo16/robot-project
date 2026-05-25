@@ -50,8 +50,17 @@ T_OUT   = deg2rad(35);
 T_IN    = deg2rad(-20);
 T_PINCH = deg2rad(40);   % 拇指对捏时的近端弯曲角
 
+#各种手势的代码
 #g_0 = makeHand(BEND, BEND, BEND, BEND,  T_IN, HALF, COUPLE);
-
+#g_1 = makeHand(0, BEND, BEND, BEND, T_IN, HALF, COUPLE);
+#g_2 = makeHand(0, BEND, 0, BEND, T_IN,  HALF, COUPLE);
+#g_3 = makeHand(0, BEND, 0, BEND, T_OUT, 0, COUPLE);
+#g_4 = makeHand(0, 0, 0, 0, T_IN, BEND, COUPLE);
+#g_5 = makeHand(0,    0,    0,    0,     T_OUT, 0,       COUPLE);
+#g_6 = makeHand(BEND, 0,    BEND, BEND,  T_OUT, 0,       COUPLE);
+#g_7 = makeHand(0, 0, BEND, BEND,  T_IN, 0,    COUPLE);
+#g_8 = makeHand(0,    BEND, BEND, BEND,  T_OUT, 0,       COUPLE);
+#g_9 = makeHand(QUAT, BEND, BEND, BEND,  T_IN, HALF,    COUPLE);
 
 % 定义手臂姿态（您提供的角度）
 arm = deg2rad([65, +65, -10, 60, 30, 30, 0]);
