@@ -32,10 +32,26 @@ function q = buildConfig(q_base, arm7, hand11, aidx, hidx)
     q(hidx) = hand11;
 end
 
-% 创建布手势（五指张开）
-COUPLE = 0.7;
-T_OUT = deg2rad(35);
-g_paper = makeHand(0, 0, 0, 0, T_OUT, 0, COUPLE);
+% ======================================================
+%  关节角常量
+%    COUPLE : 耦合比（远端 = COUPLE * 近端）
+%    BEND   : 完全弯曲 (~80°)
+%    HALF   : 半弯    (~30°)
+%    QUAT   : 四分之一弯 (~20°)
+%    T_OUT  : 拇指外展  (+35°)
+%    T_IN   : 拇指内收  (-20°)
+%    T_PINCH: 拇指对捏近端 (~40°)
+% ======================================================
+COUPLE  = 0.7;
+BEND    = deg2rad(80);
+HALF    = deg2rad(45);
+QUAT    = deg2rad(20);
+T_OUT   = deg2rad(35);
+T_IN    = deg2rad(-20);
+T_PINCH = deg2rad(40);   % 拇指对捏时的近端弯曲角
+
+#g_0 = makeHand(BEND, BEND, BEND, BEND,  T_IN, HALF, COUPLE);
+
 
 % 定义手臂姿态（您提供的角度）
 arm = deg2rad([65, +65, -10, 60, 30, 30, 0]);
