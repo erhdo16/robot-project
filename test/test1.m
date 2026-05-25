@@ -63,7 +63,7 @@ T_PINCH = deg2rad(40);   % 拇指对捏时的近端弯曲角
 #g_9 = makeHand(QUAT, BEND, BEND, BEND,  T_IN, HALF,    COUPLE);
 
 % 定义手臂姿态（您提供的角度）
-arm = deg2rad([65, +65, -10, 60, 30, 30, 0]);
+arm = deg2rad([65, +65, -10, 60, 30, 30, 0]); #展示手势的手臂姿态
 
 % 构建完整配置
 q_final = buildConfig(q_home, arm, g_paper, ARM_IDX, HAND_IDX);
