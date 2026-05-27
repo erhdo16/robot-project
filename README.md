@@ -107,6 +107,8 @@
 
 g_scissors = makeHand(0,    BEND, 0,    BEND, 0, 0, COUPLE);
 <img width="1026" height="898" alt="image" src="https://github.com/user-attachments/assets/3ae0241b-e490-4095-9f8a-9c97f41af511" />
+g_scissors = makeHand(0,    BEND, 0,    BEND, BEND, 0, COUPLE);
+<img width="922" height="794" alt="image" src="https://github.com/user-attachments/assets/1631e68c-29dc-41e4-ba24-e4de21a41b83" />
 
 
 ## 给ai的
