@@ -23,20 +23,19 @@
 ## 开发环境
 - MATLAB（2025b及以上）
 ## 核心仿真与控制
-- **Simulink**
+- **Simulink** （直接打开建模需要装这个）
 - **Robotics System Toolbox (机器人系统工具箱)**
-- Simscape & Simscape Multibody（这两个通常一起装）
 
-负责把 URDF 文件变成一个有重力、有碰撞、能动的 3D 物理机器人。
-- Control System Toolbox (控制系统工具箱)
+&nbsp;&nbsp;负责把 URDF 文件变成一个有重力、有碰撞、能动的 3D 物理机器人。
 ## 视觉识别与交互逻辑
 - Computer Vision Toolbox (计算机视觉工具箱)
 - MATLAB Support Package for USB Webcams
-调用摄像头采集画面，提取人手的特征。
+&nbsp;&nbsp;调用摄像头采集画面，提取人手的特征。
 - Image Processing Toolbox (图像处理工具箱)
 
 视觉辅助。比如把摄像头的背景去掉，只锁定手部区域，减少干扰。
 - Deep Learning Toolbox (深度学习工具箱)
+- Deep Learning Toolbox Model for SqueezeNet Network
 ## 时间
 第15周 6.2/6.4
 
@@ -115,11 +114,8 @@ g_scissors = makeHand(0,    BEND, 0,    BEND, BEND, 0, COUPLE);
 ### 课题
 课题3：手势舞 项目背景 人形机器人不仅需要完成抓取任务，还需具备与人交互的能力。通过 控制5自由度欠驱动手，可以手势动作，如石头、剪刀、布或字母手势 。尽管欠驱动手无法独立控制每根手指，但通过合理设计手部开合程 度和手指耦合运动，仍可实现有区分度的手势。7自由度手臂可将手部 移动到不同空间位置，增强表现力。 任务目标 1. 建立7自由度手臂与5自由度欠驱动手的运动学模型 2. 分析欠驱动手的手指耦合机制，设计至少3种可区分的手势 3. 实现关节空间轨迹规划，使手势动作平滑连贯 4. 将手部移动到不少于2个不同的空间位置，展示相同手势。
 
-我们采用matlab作为唯一软件，7自由度手臂没提到就是不冗余
+我们采用matlab作为唯一软件
 
-这是xx文件的信息，还需要提供什么
-### 一些话
-这是我们机器人建模与控制4人小组准备做的课题，请提供二十天（甚至更少）完成这个项目的步骤；以及我是组长，教我怎么使用github建立它的仓库
 ### robot.showdetails()的结果：
 details
 --------------------
