@@ -4,6 +4,10 @@
 ```
 robot_project/
 ├── main.m                  ← 唯一入口，直接运行这个
+├── kepler_WeidJoint/       ← 老师发的一整个文件夹
+│   ├── JingChuJointR.urdf
+│   ├── meshes/
+│   └── ...
 ├── core/
 │   ├── init_robot.m        ← 机器人模型 + 手势库 + 手臂姿态
 │   ├── init_vision.m       ← 摄像头 + 检测器 + DL模型加载
