@@ -67,8 +67,8 @@ g_rock = makeHand(BEND, BEND, BEND, BEND,  T_IN, HALF, COUPLE);
 g_thumb = makeHand(BEND, BEND, BEND, BEND, 0,  0,    COUPLE);
 
 % 定义手臂姿态（您提供的角度）
-arm = deg2rad([65, +65, -10, 60, 30, 30, 0]); % 展示手势的手臂姿态
-% arm = deg2rad([30, +30, -10, 60, -20, 0, 10]); %点赞、剪刀石头布
+arm = deg2rad([65, +65, -10, 60, 30, 30, 0]); % 这是展示手势、打招呼的手臂姿态
+% arm = deg2rad([30, +30, -10, 60, -20, 0, 10]); %这是点赞、剪刀石头布
 
 % 构建完整配置
 q_final = buildConfig(q_home, arm, g_paper, ARM_IDX, HAND_IDX);
