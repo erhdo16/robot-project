@@ -5,7 +5,19 @@
 % ========================================================================
 function R = init_robot()
 
-robot = importrobot('JingChuJointR.urdf');
+% ── URDF路径：kepler_WeidJoint文件夹在robot_project/下 ──────────────
+% mfilename('fullpath') = .../robot_project/core/init_robot.m
+% fileparts调用两次：core/ → robot_project/
+SCRIPT_DIR = fileparts(fileparts(mfilename('fullpath')));
+urdf_path  = fullfile(SCRIPT_DIR, 'kepler_WeidJoint', 'JingChuJointR.urdf');
+
+if ~isfile(urdf_path)
+    error(['找不到URDF文件: %s\n' ...
+           '请确认 kepler_WeidJoint 文件夹已放入 robot_project/ 目录下。'], ...
+           urdf_path);
+end
+
+robot = importrobot(urdf_path);
 robot.DataFormat = 'row';
 q_home = homeConfiguration(robot);
 
