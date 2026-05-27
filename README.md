@@ -17,6 +17,8 @@ robot_project/
 │   ├── mode_demo.m         ← 功能1：0-9顺序演示
 │   ├── mode_mirror.m       ← 功能2：镜像识别
 │   └── mode_rps.m          ← 功能3：猜拳游戏
+├── collect_gesture_data.m
+├── train_gesture_net.m
 └── gesture_net.mat         ← 训练好的DL模型（可选）
 ```
 
