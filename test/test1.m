@@ -61,6 +61,10 @@ g_6 = makeHand(BEND, 0,    BEND, BEND,  T_OUT, 0,       COUPLE);
 g_7 = makeHand(0, 0, BEND, BEND,  T_IN, 0,    COUPLE);
 g_8 = makeHand(0,    BEND, BEND, BEND,  T_OUT, 0,       COUPLE);
 g_9 = makeHand(QUAT, BEND, BEND, BEND,  T_IN, HALF,    COUPLE);
+% g_scissors = makeHand(0,    BEND, 0,    BEND, T_IN, BEND, COUPLE);
+% g_paper = makeHand(0,    0,    0,    0,    0, 0,    COUPLE);
+% g_rock = makeHand(BEND, BEND, BEND, BEND,  T_IN, HALF, COUPLE);
+% g_thumb = makeHand(BEND, BEND, BEND, BEND, 0,  0,    COUPLE);
 
 % 定义手臂姿态（您提供的角度）
 arm = deg2rad([65, +65, -10, 60, 30, 30, 0]); % 展示手势的手臂姿态
