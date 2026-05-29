@@ -22,6 +22,14 @@ labels   = {'0','1','2','3','4','5','6','7','8','9'};
 % 前5个高位，后5个低位
 arm_for  = [repmat({R.arm_hi},1,5), repmat({R.arm_lo},1,5)];
 
+% 进入时立刻刷新摄像头标题，清除上一个模式的残留
+if ~isempty(cam) && ~isempty(hImg)
+    try
+        vision_utils.updateCamView(hImg, snapshot(cam), [], ...
+            '演示模式 | 0→9 手势演示中...', '模式1: 演示');
+    catch; end
+end
+
 % 高→低位切换时用慢速轨迹
 fprintf('[演示模式] 开始 0→9 手势演示\n');
 
