@@ -26,7 +26,7 @@ clear; clc; close all;
 %    · 双窗口：摄像头 + 3D机器人实时动画
 %    · 组员拿到代码后只需把下面这行改成 false
 % ========================================================================
-DEBUG_MODE = false;   % ← 轻薄本用 true，游戏本/实机改 false
+DEBUG_MODE = true;   % ← 轻薄本用 true，游戏本/实机改 false
 
 % ── 路径修复：基于main.m自身位置，不依赖MATLAB当前目录 ──────────────────
 SCRIPT_DIR = fileparts(mfilename('fullpath'));
@@ -200,7 +200,8 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
             case 'mirror'
                 q_current = mode_mirror(R, V, ax_robot, hImg, q_current, fig_cam);
             case 'rps'
-                q_current = mode_rps(R, V, ax_robot, hImg, q_current, fig_cam);
+                % ROS 暂未接入实机，传空占位；接实机后替换为真实 ROS 对象
+                q_current = mode_rps(R, V, [], ax_robot, hImg, q_current, fig_cam);
         end
 
         setappdata(fig_cam,'mode','idle');
