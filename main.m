@@ -121,7 +121,10 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
         q_current = robot_utils.execTraj(traj, R.robot, ax_robot, ...
             '人离开，归零', V.cam, hImg, 2);
         CURRENT_MODE = 'idle';
-        setappdata(fig_cam,'mode','idle');
+        exited_to = getappdata(fig_cam,'mode');
+        if strcmp(exited_to, CURRENT_MODE) || strcmp(exited_to,'switch')
+            setappdata(fig_cam,'mode','idle');
+        end
     end
 
     % ── 打招呼（同一张脸只触发一次）────────────────────────────────
@@ -194,17 +197,22 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
         CURRENT_MODE = new_mode;
         fprintf('[%s] 进入模式: %s\n', robot_utils.ts(), CURRENT_MODE);
 
+        % 把 appdata 设为当前模式名，mode_mirror/mode_rps/mode_demo 的退出条件依赖此值
+        setappdata(fig_cam,'mode', CURRENT_MODE);
+
         switch CURRENT_MODE
             case 'demo'
-                q_current = mode_demo(R, ax_robot, V.cam, hImg, q_current);
+                q_current = mode_demo(R, ax_robot, V.cam, hImg, q_current, fig_cam);
             case 'mirror'
                 q_current = mode_mirror(R, V, ax_robot, hImg, q_current, fig_cam);
             case 'rps'
-                % ROS 暂未接入实机，传空占位；接实机后替换为真实 ROS 对象
                 q_current = mode_rps(R, V, [], ax_robot, hImg, q_current, fig_cam);
         end
 
-        setappdata(fig_cam,'mode','idle');
+        exited_to = getappdata(fig_cam,'mode');
+        if strcmp(exited_to, CURRENT_MODE) || strcmp(exited_to,'switch')
+            setappdata(fig_cam,'mode','idle');
+        end
         CURRENT_MODE = 'idle';
 
         % 各模式结束后也回到 q_home
