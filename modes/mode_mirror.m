@@ -27,14 +27,15 @@ cached_bbox   = [];
 fprintf('[镜像模式] 启动，对摄像头展示 0-9 手势\n');
 fprintf('[镜像模式] 按键盘 1/2/3 切换模式，ESC 停止\n');
 
-while ishandle(fig_cam) && ~isequal(getappdata(fig_cam,'mode'),'switch')
+% 退出条件：appdata 不再是 'mirror'（切换到其他模式或 ESC）
+while ishandle(fig_cam) && isequal(getappdata(fig_cam,'mode'),'mirror')
     frame_count = frame_count + 1;
     frame = snapshot(V.cam);
 
     do_detect = (mod(frame_count, V.DETECT_INTERVAL) == 1);
     do_dl     = (mod(frame_count, V.DL_INTERVAL)     == 1);
 
-    % 人脸追踪（维持打招呼状态，不重复触发）
+    % 人脸追踪
     [~, V, cached_bbox] = vision_utils.updateFaceTrack(frame, V, do_detect);
 
     % 手势识别
@@ -50,8 +51,10 @@ while ishandle(fig_cam) && ~isequal(getappdata(fig_cam,'mode'),'switch')
         last_label   = cached_label;
     end
 
-    % 触发响应（DL需置信度>0.75，传统CV固定0.6直接通过）
-    conf_ok = (V.use_dl && cached_conf > 0.75) || (~V.use_dl && cached_conf > 0.5);
+    % 触发响应：
+    %   DL 模式：置信度提高到 0.85，减少背景误识别
+    %   传统CV：保持 0.6
+    conf_ok = (V.use_dl && cached_conf > 0.85) || (~V.use_dl && cached_conf > 0.6);
 
     if stable_count == V.STABLE_THRESH && ~isempty(cached_label) && conf_ok
         if GDICT.isKey(cached_label)
