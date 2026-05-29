@@ -7,10 +7,10 @@
 %  每个手势停留 R.HOLD_SECS 秒，切换间用平滑轨迹过渡
 %
 %  调用方式：
-%    q_current = mode_demo(R, ax_robot, cam, hImg, q_current)
+%    q_current = mode_demo(R, ax_robot, cam, hImg, q_current, fig_cam)
 %  返回执行结束时的关节角
 % ========================================================================
-function q_current = mode_demo(R, ax_robot, cam, hImg, q_current)
+function q_current = mode_demo(R, ax_robot, cam, hImg, q_current, fig_cam)
 
 ru = robot_utils;   % 工具类别名
 
@@ -30,10 +30,15 @@ if ~isempty(cam) && ~isempty(hImg)
     catch; end
 end
 
-% 高→低位切换时用慢速轨迹
 fprintf('[演示模式] 开始 0→9 手势演示\n');
 
 for k = 1:10
+    % 检查是否被键盘切换打断
+    if ishandle(fig_cam) && ~isequal(getappdata(fig_cam,'mode'),'demo')
+        fprintf('[演示模式] 被中途打断，退出\n');
+        return;
+    end
+
     arm   = arm_for{k};
     hand  = gestures{k};
     label = labels{k};
@@ -53,9 +58,14 @@ for k = 1:10
 
     fprintf('[演示模式] 手势 [%s] 到位\n', label);
 
-    % 停留（同时保持摄像头刷新）
+    % 停留（同时保持摄像头刷新，并检查中途切换）
     t0 = tic;
     while toc(t0) < R.HOLD_SECS
+        % 被切换则立即退出
+        if ishandle(fig_cam) && ~isequal(getappdata(fig_cam,'mode'),'demo')
+            fprintf('[演示模式] 停留中被打断，退出\n');
+            return;
+        end
         if ~isempty(cam) && ~isempty(hImg)
             try, set(hImg,'CData',snapshot(cam)); catch; end
         end
