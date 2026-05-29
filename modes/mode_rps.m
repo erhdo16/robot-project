@@ -14,24 +14,17 @@
 %    2. 机器人做出对应手势 + 打印结果
 %    3. 停留2秒后归位，等待下一局
 % ========================================================================
-function q_current = mode_rps(R, V, ax_robot, hImg, q_current, fig_cam)
+function q_current = mode_rps(R, V, ROS, ax_robot, hImg, q_current, fig_cam)
 
 ru = robot_utils;
 
 % ── 猜拳逻辑表 ────────────────────────────────────────────────────────
-%  key   = 人出的手势标签（只响应 '0','2','5'）
-%  hand  = 机器人应出的手部向量
-%  name_human  = 人的手势名
-%  name_robot  = 机器人手势名
-%  result_txt  = 显示文字
-
-RPS = struct();
-RPS('0') = struct('hand',R.g_paper,    'robot_name','布🖐',   ...
-                  'human_name','石头✊','win_txt','机器人赢！布包石头');
-RPS('2') = struct('hand',R.g_rock,     'robot_name','石头✊', ...
-                  'human_name','剪刀✌','win_txt','机器人赢！石头剪剪刀');
-RPS('5') = struct('hand',R.g_scissors, 'robot_name','剪刀✌', ...
-                  'human_name','布🖐',  'win_txt','机器人赢！剪刀剪布');
+% 用 containers.Map 正确初始化，避免 struct 下标赋值报错
+RPS = containers.Map(...
+    {'0','2','5'}, ...
+    { struct('hand',R.g_paper,    'robot_name','布🖐',   'human_name','石头✊','win_txt','机器人赢！布包石头'), ...
+      struct('hand',R.g_rock,     'robot_name','石头✊', 'human_name','剪刀✌','win_txt','机器人赢！石头剪剪刀'), ...
+      struct('hand',R.g_scissors, 'robot_name','剪刀✌', 'human_name','布🖐', 'win_txt','机器人赢！剪刀剪布') });
 
 % 注意：g_rock = g_0，g_scissors = g_2（你的代码里已区分）
 % g_paper 是专用的布手势（拇指不外展），和 g_5 略有区别
@@ -52,7 +45,8 @@ rounds      = 0;
 fprintf('[猜拳模式] 启动！出石头✊、剪刀✌或布🖐\n');
 fprintf('[猜拳模式] 按键盘 1/2/3 切换模式\n');
 
-while ishandle(fig_cam) && ~isequal(getappdata(fig_cam,'mode'),'switch')
+% 退出条件：appdata 不再是 'rps'（切换到其他模式或 ESC）
+while ishandle(fig_cam) && isequal(getappdata(fig_cam,'mode'),'rps')
     frame_count = frame_count + 1;
     frame = snapshot(V.cam);
 
@@ -90,6 +84,11 @@ while ishandle(fig_cam) && ~isequal(getappdata(fig_cam,'mode'),'switch')
         traj  = ru.smoothTraj(q_current, q_new, R.TRAJ_N_FAST);
         q_current = ru.execTraj(traj, R.robot, ax_robot, ...
             [info.win_txt '  机器人: ' info.robot_name], V.cam, hImg, 2);
+
+        % 发送猜拳动作给实机（映射到Derek的手臂动作）
+        if ~isempty(ROS)
+            ros2_utils.sendRPS(ROS, info.rps_key);
+        end
 
         % 显示胜负，停留2秒
         win_frame = insertText(frame, [20 20], info.win_txt, ...
