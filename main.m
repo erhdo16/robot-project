@@ -1,10 +1,7 @@
 % ========================================================================
 %  main.m — 主入口
 %
-%  模式切换方式（两种，同时支持）：
-%    ① 键盘（电脑调试用）：点击摄像头窗口后按 1/2/3/Q/ESC
-%    ② 手势触发（实物用）：对摄像头比"点赞👍"保持 3 秒
-%       → 循环切换 idle→demo→mirror→rps→idle
+%  模式切换方式（键盘）：点击摄像头窗口后按 1/2/3/Q/ESC
 %
 %  打招呼逻辑：
 %    - PointTracker追踪，同一张脸只打一次招呼
@@ -44,18 +41,9 @@ R = init_robot();
 V = init_vision();
 
 % ────────────────────────────────────────────────────────────────────────
-%  手势触发模式切换的参数
-%    触发手势：点赞(g_thumb)，识别标签 'thumb'
-%    需连续稳定识别 SWITCH_HOLD_FRAMES 帧才切换（约3秒@30fps）
-% ────────────────────────────────────────────────────────────────────────
-SWITCH_HOLD_FRAMES = 90;    % 约3秒（摄像头约30fps）
-switch_count       = 0;     % 当前连续识别到点赞的帧数
-MODE_SEQ = {'idle','demo','mirror','rps'};  % 切换顺序
-
-% ────────────────────────────────────────────────────────────────────────
 %  图形界面
 % ────────────────────────────────────────────────────────────────────────
-fig_cam = figure('Name','摄像头  [1]演示 [2]镜像 [3]猜拳 [Q]退出 | 实物:点赞3秒切换', ...
+fig_cam = figure('Name','摄像头  [1]演示 [2]镜像 [3]猜拳 [Q]退出', ...
     'Position',[20 260 660 510], ...
     'Renderer','opengl', ...
     'KeyPressFcn', @onKey);
@@ -87,10 +75,9 @@ face_lost_ct = 0;
 frame_count  = 0;
 CURRENT_MODE = 'idle';
 
-fprintf('\n【电脑调试】键盘操作（需先点击摄像头窗口）:\n');
+fprintf('\n键盘操作（需先点击摄像头窗口）:\n');
 fprintf('  1 → 演示模式   2 → 镜像模式   3 → 猜拳模式\n');
-fprintf('  ESC → 退出当前模式   Q → 退出程序\n');
-fprintf('\n【实物操作】对摄像头比 👍 点赞手势保持约3秒 → 循环切换模式\n\n');
+fprintf('  ESC → 退出当前模式   Q → 退出程序\n\n');
 
 % ────────────────────────────────────────────────────────────────────────
 %  主循环
@@ -100,7 +87,6 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
     frame_count = frame_count + 1;
     frame       = snapshot(V.cam);
     do_detect   = (mod(frame_count, V.DETECT_INTERVAL) == 1);
-    do_dl       = (mod(frame_count, V.DL_INTERVAL)     == 1);
 
     % ── 人脸追踪 ────────────────────────────────────────────────────
     [face_stable, V, bbox] = vision_utils.updateFaceTrack(frame, V, do_detect);
@@ -115,14 +101,12 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
     if face_lost_ct >= V.FACE_LOST_MAX && greeted
         greeted      = false;
         face_lost_ct = 0;
-        switch_count = 0;
         fprintf('[%s] 人脸消失 → 归零\n', robot_utils.ts());
         traj = robot_utils.smoothTraj(q_current, R.q_home, R.TRAJ_N_SLOW);
         q_current = robot_utils.execTraj(traj, R.robot, ax_robot, ...
             '人离开，归零', V.cam, hImg, 2);
         CURRENT_MODE = 'idle';
-        exited_to = getappdata(fig_cam,'mode');
-        if strcmp(exited_to, CURRENT_MODE) || strcmp(exited_to,'switch')
+        if ~strcmp(getappdata(fig_cam,'mode'), CURRENT_MODE)
             setappdata(fig_cam,'mode','idle');
         end
     end
@@ -131,7 +115,6 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
     if face_stable && ~greeted && strcmp(CURRENT_MODE,'idle')
         fprintf('[%s] 新人脸出现 → 打招呼\n', robot_utils.ts());
 
-        % 举手打招呼
         q_greet = robot_utils.buildConfig(R.q_home, R.arm_greet, R.g_5, ...
                                           R.ARM_IDX, R.HAND_IDX);
         traj = robot_utils.smoothTraj(q_current, q_greet, R.TRAJ_N_SLOW);
@@ -139,7 +122,6 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
             '你好！👋', V.cam, hImg, 2);
         pause(0.6);
 
-        % ★ 打招呼完成后回到完全初始位置 q_home ★
         traj = robot_utils.smoothTraj(q_current, R.q_home, R.TRAJ_N_MID);
         q_current = robot_utils.execTraj(traj, R.robot, ax_robot, ...
             '归零 → 等待指令', V.cam, hImg, 2);
@@ -148,56 +130,13 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
         fprintf('[%s] 打招呼完成，已归零\n', robot_utils.ts());
     end
 
-    % ── 手势触发模式切换（实物用，同时对电脑也有效）────────────────
-    %    识别到"点赞"持续 SWITCH_HOLD_FRAMES 帧 → 切换到下一个模式
-    if strcmp(CURRENT_MODE,'idle') && face_stable && greeted && do_dl
-        [sw_label, sw_conf] = vision_utils.detectGesture(frame, V);
-        is_thumb = strcmp(sw_label,'thumb') || ...
-                   (V.use_dl && sw_conf > 0.8 && strcmp(sw_label,'thumb'));
-
-        % 传统CV方案：点赞手势单独检测（拇指伸直其余握拳）
-        if ~V.use_dl
-            is_thumb = detectThumb(frame);
-        end
-
-        if is_thumb
-            switch_count = switch_count + 1;
-        else
-            switch_count = 0;
-        end
-
-        % 进度条显示在画面上
-        if switch_count > 10
-            pct = switch_count / SWITCH_HOLD_FRAMES;
-            vision_utils.updateSwitchProgress(hImg, pct);
-        end
-
-        if switch_count >= SWITCH_HOLD_FRAMES
-            switch_count = 0;
-            % 找当前模式在序列中的位置，切换到下一个
-            cur_idx  = find(strcmp(MODE_SEQ, CURRENT_MODE));
-            next_idx = mod(cur_idx, length(MODE_SEQ)) + 1;
-            next_mode = MODE_SEQ{next_idx};
-            if ~strcmp(next_mode,'idle')
-                setappdata(fig_cam,'mode', next_mode);
-                fprintf('[%s] 手势切换 → %s\n', robot_utils.ts(), next_mode);
-            end
-        end
-    else
-        if ~strcmp(CURRENT_MODE,'idle')
-            switch_count = 0;
-        end
-    end
-
-    % ── 键盘 / 手势 触发的模式切换执行 ─────────────────────────────
+    % ── 键盘触发的模式切换执行 ──────────────────────────────────────
     new_mode = getappdata(fig_cam,'mode');
     if ~strcmp(new_mode,'idle') && ~strcmp(new_mode,CURRENT_MODE) ...
        && ~strcmp(new_mode,'switch')
 
         CURRENT_MODE = new_mode;
         fprintf('[%s] 进入模式: %s\n', robot_utils.ts(), CURRENT_MODE);
-
-        % 把 appdata 设为当前模式名，mode_mirror/mode_rps/mode_demo 的退出条件依赖此值
         setappdata(fig_cam,'mode', CURRENT_MODE);
 
         switch CURRENT_MODE
@@ -215,7 +154,7 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
         end
         CURRENT_MODE = 'idle';
 
-        % 各模式结束后也回到 q_home
+        % 各模式结束后回到 q_home
         if max(abs(q_current - R.q_home)) > 0.01
             traj = robot_utils.smoothTraj(q_current, R.q_home, R.TRAJ_N_SLOW);
             q_current = robot_utils.execTraj(traj, R.robot, ax_robot, ...
@@ -226,8 +165,7 @@ while ishandle(fig_cam) && ~getappdata(fig_cam,'quit')
     % ── 摄像头显示（待机） ───────────────────────────────────────────
     if strcmp(CURRENT_MODE,'idle')
         if face_stable && greeted
-            pct  = switch_count / SWITCH_HOLD_FRAMES;
-            stxt = sprintf('等待指令  [1]演示 [2]镜像 [3]猜拳 | 点赞3秒切换(%.0f%%)', pct*100);
+            stxt = '等待指令  [1]演示  [2]镜像  [3]猜拳';
         elseif face_stable
             stxt = '检测到人脸，正在打招呼...';
         else
@@ -258,48 +196,5 @@ function onKey(src, evt)
         case '2',      setappdata(src,'mode','mirror'); fprintf('[键盘] → 镜像\n');
         case '3',      setappdata(src,'mode','rps');    fprintf('[键盘] → 猜拳\n');
         case 'escape', setappdata(src,'mode','switch'); fprintf('[键盘] ESC退出当前模式\n');
-    end
-end
-
-% ========================================================================
-%  传统CV方案的点赞检测（拇指伸直+其余握拳）
-%  独立于普通手势识别，专门用于模式切换触发
-% ========================================================================
-function is_thumb = detectThumb(frame)
-    is_thumb = false;
-    try
-        [H,W,~] = size(frame);
-        % 取画面中央偏下区域
-        roi = frame(round(H*0.3):H, round(W*0.2):round(W*0.8), :);
-        roi_s = imresize(roi, 0.75);
-        ycbcr = rgb2ycbcr(roi_s);
-        Cb = double(ycbcr(:,:,2)); Cr = double(ycbcr(:,:,3));
-        skin = (Cb>=77)&(Cb<=127)&(Cr>=133)&(Cr<=173);
-        se   = strel('disk',4);
-        mask = imclose(imopen(skin,se),se);
-        mask = imfill(mask,'holes');
-        cc   = bwconncomp(mask);
-        if cc.NumObjects==0, return; end
-        areas = cellfun(@numel,cc.PixelIdxList);
-        [maxA,idx] = max(areas);
-        if maxA < 2000, return; end
-        hm = false(size(mask)); hm(cc.PixelIdxList{idx})=true;
-        % 点赞特征：手的纵横比偏高（拇指向上使轮廓偏窄偏高）
-        %           填充率偏高（其余四指握拳，凸缺陷少）
-        props = regionprops(hm,'BoundingBox');
-        if isempty(props), return; end
-        bb = props(1).BoundingBox;
-        aspect = bb(4)/bb(3);  % height/width，点赞时 > 1.3
-        B  = bwboundaries(hm,'noholes');
-        if isempty(B), return; end
-        cnt = B{1};
-        kh  = convhull(cnt(:,2),cnt(:,1));
-        hp  = cnt(kh,:);
-        ha  = polyarea(hp(:,2),hp(:,1));
-        fr  = maxA/ha;
-        % 点赞：高纵横比 + 高填充率（握拳无指缝）
-        is_thumb = (aspect > 1.3) && (fr > 0.82);
-    catch
-        is_thumb = false;
     end
 end
